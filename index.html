@@ -3,363 +3,1035 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>North & Lever | Sistema de Triage</title>
+  <title>Spark TCC & Gestión de Tareas</title>
+  
+  <!-- Estilos y librerías -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --accent-lever: #f59e0b;
-      --accent-maint: #3b82f6;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --border: #334155;
-      --success: #10b981;
-      --danger: #ef4444;
+      --bg-principal: #0d1117;
+      --bg-card: #161b22;
+      --borde-card: #30363d;
+      --azul-texto: #58a6ff;
+      --texto-primario: #c9d1d9;
+      --texto-secundario: #8b949e;
+      --verde-accion: #238636;
+      --rojo-alerta: #da3633;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 16px; max-width: 600px; margin: 0 auto; }
+    body {
+      background-color: var(--bg-principal);
+      color: var(--texto-primario);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+    }
 
-    header { background: linear-gradient(135deg, #1e1b4b, #311b92); border: 1px solid #6366f1; border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: center; }
-    header h1 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: #a5b4fc; margin-bottom: 4px; }
-    header p { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .container {
+      width: 100%;
+      max-width: 600px;
+    }
 
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
-    .card h2 { font-size: 1rem; margin-bottom: 12px; }
-    input[type="text"] { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 1rem; margin-bottom: 8px; }
-    
-    .quiz-box { display: none; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px; }
-    .quiz-box p { font-size: 0.9rem; margin-bottom: 10px; color: #e2e8f0; }
-    .btn-group { display: flex; gap: 8px; }
-    button { padding: 8px 12px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
-    .btn-primary { background: var(--accent-lever); color: #000; flex: 1; }
-    .btn-secondary { background: var(--border); color: #fff; flex: 1; }
-    .btn-action { background: var(--success); color: #000; width: 100%; padding: 12px; font-size: 1rem; margin-top: 8px; }
-    .btn-add-micro { background: #334155; color: #f59e0b; padding: 6px 12px; font-size: 0.8rem; border-radius: 4px; margin-top: 6px; }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--borde-card);
+    }
 
-    .section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; justify-content: space-between; }
-    .title-lever { color: var(--accent-lever); }
-    .title-maint { color: var(--accent-maint); }
-    .title-done { color: var(--success); margin-top: 24px; }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
 
-    .task-list { list-style: none; margin-bottom: 20px; }
-    .task-item { background: var(--card-bg); border-left: 4px solid var(--border); border-radius: 0 8px 8px 0; padding: 12px; margin-bottom: 12px; }
-    .task-item.lever { border-left-color: var(--accent-lever); }
-    .task-item.maint { border-left-color: var(--accent-maint); }
-    .task-item.done { border-left-color: var(--success); opacity: 0.85; }
-    .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; }
-    .task-title { font-weight: 600; font-size: 0.95rem; flex: 1; }
-    
-    .micro-container { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
-    .micro-step { background: #0f172a; border: 1px dashed var(--accent-lever); border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; color: #fef08a; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-    .micro-step.completed { text-decoration: line-through; opacity: 0.5; border-style: solid; border-color: var(--success); color: var(--success); }
-    .micro-text { flex: 1; word-break: break-word; }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--borde-card);
+      color: var(--texto-primario);
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      font-weight: bold;
+    }
 
-    .controls { display: flex; gap: 4px; align-items: center; }
-    .icon-btn { background: #1e293b; border: 1px solid var(--border); color: var(--text-muted); padding: 4px 6px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; }
-    .icon-btn:hover { color: #fff; border-color: #64748b; }
-    .btn-danger { color: #f87171; }
-    .btn-danger:hover { background: #450a0a; }
-    
-    .timestamp { font-size: 0.75rem; color: var(--success); font-weight: normal; display: block; margin-top: 4px; }
+    .tab-btn.active {
+      border-color: var(--azul-texto);
+      color: var(--azul-texto);
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--borde-card);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      background: #07090e;
+      border: 1px solid var(--borde-card);
+      color: var(--texto-primario);
+      padding: 8px;
+      border-radius: 6px;
+      box-sizing: border-box;
+      margin-top: 4px;
+      margin-bottom: 10px;
+    }
+
+    .btn-primario {
+      background: var(--verde-accion);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      width: 100%;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-secundario {
+      background: transparent;
+      border: 1px solid var(--borde-card);
+      color: var(--texto-primario);
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-borrar {
+      background: transparent;
+      border: 1px solid var(--rojo-alerta);
+      color: var(--rojo-alerta);
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .hidden { display: none; }
+    .brecha-tag {
+      background: #1f6beb33;
+      color: var(--azul-texto);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Tu Norte (Valencia Máxima)</h1>
-    <p>🎯 $1M USD + Libertad Financiera y Viajes con La Peque</p>
-  </header>
+<div class="container">
+  
+  <!-- Header y Estado de Sesión -->
+  <div class="header-bar">
+    <span id="txtEstadoSesion" style="font-size: 0.85rem;">🔒 Modo Invitado (Sin guardar en la nube)</span>
+    <button id="btnAuthAction" onclick="gestionarSesion()" class="btn-secundario" style="font-size: 0.8rem;">Ingresar con Email</button>
+  </div>
 
-  <div class="card">
-    <h2>📥 Registrar Pendiente en el Sistema</h2>
-    <input type="text" id="taskInput" placeholder="Ej: Hablar con el abogado por la sucesión..." />
-
-    <div id="q1Box" class="quiz-box">
-      <p><strong>Filtro 1:</strong> ¿Esta tarea genera ingresos, destraba capital, elimina una gran fuga de ansiedad o construye tu libertad a largo plazo?</p>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="answerQ1(true)">SÍ (Es Palanca)</button>
-        <button class="btn-secondary" onclick="answerQ1(false)">NO (Mantenimiento)</button>
-      </div>
+  <!-- Banner de Configuración API -->
+  <div class="card" style="padding: 10px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size: 0.8rem; font-weight:bold;">🔑 API Key (Opcional IA)</span>
+      <button onclick="toggleAyudaAPI()" class="btn-secundario" style="font-size:0.7rem; padding: 2px 6px;">?</button>
     </div>
-
-    <div id="q2Box" class="quiz-box">
-      <p><strong>Filtro 2 (Resistencia):</strong> ¿Sentís fricción mental o postergación para empezarla?</p>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="answerQ2(true)">SÍ (Dividir en Dominó)</button>
-        <button class="btn-secondary" onclick="answerQ2(false)">NO (Pasa Directo)</button>
-      </div>
-    </div>
-
-    <div id="q3Box" class="quiz-box">
-      <p><strong>Efecto Dominó:</strong> Agregá los micro-pasos secuenciales:</p>
-      <div id="microInputsContainer">
-        <input type="text" class="micro-input-field" placeholder="Contactar al mecánico..." />
-      </div>
-      <button class="btn-add-micro" onclick="addMicroInputField()">+ Agregar otro micro-paso</button>
-      <button class="btn-action" onclick="saveTask()">Confirmar e Insertar en el Día</button>
+    <input type="password" id="userApiKey" placeholder="Pegá tu API Key aquí..." onchange="guardarKeyLocal()" style="margin-bottom: 0;">
+    <div id="ayudaAPIBox" class="hidden" style="font-size: 0.75rem; color: var(--texto-secundario); margin-top: 5px;">
+      Permite usar IA para análisis avanzado (Gemini, Groq, Claude u OpenAI). Dejar en blanco para usar el motor local dinámico.
     </div>
   </div>
 
-  <main>
-    <div class="section-title title-lever">
-      <span>🎯 El 20% Palanca (Máxima Batería)</span>
-      <span id="leverCount">0</span>
+  <!-- Pestañas de Navegación -->
+  <div class="tabs">
+    <div id="tabNuevo" class="tab-btn active" onclick="cambiarVista('nuevo')">Nuevo Registro</div>
+    <div id="tabHistorial" class="tab-btn" onclick="cambiarVista('historial')">Historial y Tareas</div>
+  </div>
+
+  <!-- VISTA 1: NUEVO REGISTRO -->
+  <div id="vistaNuevo">
+    <div class="card">
+      <label style="font-size: 0.85rem; font-weight: bold;">Identificación del Paciente / Usuario</label>
+      <input type="text" id="inputNombrePaciente" placeholder="Nombre completo (Opcional)">
+      <input type="email" id="inputEmailPaciente" placeholder="Correo electrónico (Opcional)">
+
+      <label style="font-size: 0.85rem; font-weight: bold; margin-top: 10px; display:block;">Situación Detonante / Registro TCC</label>
+      <textarea id="textoEntrada" rows="4" placeholder="Describí la situación, pensamiento o malestar actual..."></textarea>
+      
+      <button id="btnAnalizar" onclick="analizarRegistroHibrido()" class="btn-primario">Comprender este momento</button>
     </div>
-    <ul id="leverList" class="task-list"></ul>
 
-    <div class="section-title title-maint">
-      <span>🧱 El 80% Mantenimiento (Energía Secundaria)</span>
-      <span id="maintCount">0</span>
+    <!-- Bloque de Resultados del Análisis -->
+    <div id="bloqueResultado" class="card hidden">
+      <div style="display:flex; justify-content:space-between; font-size:0.75rem; color: var(--texto-secundario); margin-bottom:10px;">
+        <span id="metaFecha"></span>
+        <span id="metaModo"></span>
+      </div>
+
+      <p style="font-size:0.85rem;"><strong>1. Situación:</strong> <span id="resPaso1"></span></p>
+      <p style="font-size:0.85rem;"><strong>2. Pensamiento Automático:</strong> <span id="resPaso2"></span></p>
+      
+      <!-- Evaluación Emocional -->
+      <div style="background:#07090e; padding:10px; border-radius:6px; margin: 10px 0;">
+        <label style="font-size:0.8rem; font-weight:bold;">Nivel de Malestar Inicial (0-100%): <span id="valEmo1">50%</span></label>
+        <input type="range" id="sliderEmo1" min="0" max="100" value="50" oninput="actualizarEmociones()">
+        
+        <label style="font-size:0.8rem; font-weight:bold; margin-top:8px; display:block;">Nivel de Malestar Post-Reestructuración: <span id="valEmo1Post">50%</span></label>
+        <input type="range" id="sliderEmo1Post" min="0" max="100" value="50" oninput="actualizarPost()">
+      </div>
+
+      <p style="font-size:0.85rem;"><strong>4. Conducta:</strong> <span id="resPaso4"></span></p>
+      <p style="font-size:0.85rem; color:#f85149;"><strong>5. Distorsión Cognitiva:</strong> <span id="resPaso5"></span></p>
+      <p style="font-size:0.85rem;"><strong>6. Respuesta Racional:</strong> <span id="resPaso6"></span></p>
+      <p style="font-size:0.85rem; color: var(--azul-texto);"><strong>Pregunta Socrática:</strong> <span id="resSocratica"></span></p>
+
+      <!-- Preparación de Sesión -->
+      <div id="seccionPreparacionSesion" style="margin-top:15px; border-top:1px solid var(--borde-card); padding-top:10px;">
+        <label style="font-size:0.8rem; font-weight:bold;">Reencuadre Cognitivo Personal:</label>
+        <textarea id="reencuadreCognitivo" rows="2" placeholder="¿Cómo podés replantear esta situación?"></textarea>
+        
+        <label style="font-size:0.8rem; font-weight:bold;">Reflexión Emocional:</label>
+        <textarea id="reflexionEmocional" rows="2" placeholder="¿Qué sentís tras evaluar este pensamiento?"></textarea>
+
+        <label style="font-size:0.8rem; font-weight:bold;">Foco de Trabajo para la Sesión:</label>
+        <input type="text" id="focoTerapia" placeholder="Ej: Control de la frustración, establecimiento de límites...">
+
+        <button onclick="guardarEIntegrarInforme()" class="btn-primario" style="margin-top:10px;">Guardar Registro e Integrar Informe</button>
+      </div>
     </div>
-    <ul id="maintList" class="task-list"></ul>
 
-    <div class="section-title title-done">
-      <span>✅ Historial de Logros Completados</span>
+    <!-- Vista Previa de Informe Integrado -->
+    <div id="vistaPreviaInforme" class="card hidden">
+      <h3 style="font-size:1rem; color:var(--azul-texto); margin-top:0;">📄 Vista Previa de Informe Completo</h3>
+      <div id="infFecha" style="font-size:0.75rem; color:var(--texto-secundario);"></div>
+      <div id="infPacienteDatos" style="font-size:0.8rem; font-weight:bold; margin-bottom:10px;"></div>
+      
+      <div style="font-size:0.82rem; line-height:1.4;">
+        <p><strong>Situación:</strong> <span id="infSituacion"></span></p>
+        <p><strong>Pensamiento Automático:</strong> <span id="infPensamiento"></span></p>
+        <p><strong>Evolución Emocional:</strong> <span id="infEmociones"></span></p>
+        <p><strong>Conducta:</strong> <span id="infConducta"></span></p>
+        <p><strong>Distorsiones:</strong> <span id="infDistorsiones"></span></p>
+        <p><strong>Respuesta Racional:</strong> <span id="infRespuestaRacional"></span></p>
+        <p><strong>Foco de Terapia:</strong> <span id="infFoco"></span></p>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:15px;">
+        <button onclick="imprimirOExportarPDF()" class="btn-secundario" style="flex:1;">📥 Descargar PDF</button>
+        <button onclick="compartirPorWhatsApp()" class="btn-secundario" style="flex:1; border-color:#2ea043; color:#2ea043;">💬 WhatsApp</button>
+      </div>
     </div>
-    <ul id="doneList" class="task-list"></ul>
-  </main>
+  </div>
 
-  <script>
-    let tasks = JSON.parse(localStorage.getItem('north_lever_tasks')) || [];
-    let currentTask = { title: "", isLever: false, microSteps: [] };
+  <!-- VISTA 2: HISTORIAL Y TAREAS -->
+  <div id="vistaHistorial" class="hidden">
+    <!-- Exportación Consolidada -->
+    <div class="card" style="padding:10px; margin-bottom:15px;">
+      <span style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">📥 Exportar Consolidado Clínico</span>
+      <div style="display:flex; gap:5px; margin-bottom:5px;">
+        <input type="text" id="inputExportNombre" placeholder="Nombre paciente" style="margin:0; font-size:0.75rem;">
+        <input type="email" id="inputExportEmail" placeholder="Email paciente" style="margin:0; font-size:0.75rem;">
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button onclick="exportarConsolidadoPDF('semana')" class="btn-secundario" style="flex:1; font-size:0.75rem;">Última Semana</button>
+        <button onclick="exportarConsolidadoPDF('mes')" class="btn-secundario" style="flex:1; font-size:0.75rem;">Último Mes</button>
+      </div>
+    </div>
 
-    const taskInput = document.getElementById('taskInput');
-    const q1Box = document.getElementById('q1Box');
-    const q2Box = document.getElementById('q2Box');
-    const q3Box = document.getElementById('q3Box');
+    <!-- Listado Tareas Palancas -->
+    <div style="margin-bottom:15px;">
+      <h4 style="font-size:0.85rem; color:var(--azul-texto); margin-bottom:8px;">🚀 Tareas Palanca (Alto Impacto)</h4>
+      <div id="listaPalancas"></div>
+    </div>
 
-    taskInput.addEventListener('focus', () => { if (taskInput.value.trim() !== "") q1Box.style.display = 'block'; });
-    taskInput.addEventListener('input', () => { if (taskInput.value.trim() !== "") q1Box.style.display = 'block'; else resetWizard(); });
+    <!-- Listado Tareas Mantenimiento -->
+    <div style="margin-bottom:15px;">
+      <h4 style="font-size:0.85rem; color:var(--texto-secundario); margin-bottom:8px;">🛠️ Tareas de Mantenimiento</h4>
+      <div id="listaMantenimiento"></div>
+    </div>
 
-    function answerQ1(isPalanca) {
-      currentTask.title = taskInput.value;
-      currentTask.isLever = isPalanca;
-      q1Box.style.display = 'none';
-      if (isPalanca) q2Box.style.display = 'block';
-      else saveTask();
+    <!-- Historial de Registros -->
+    <div>
+      <h4 style="font-size:0.85rem; color:var(--texto-primario); margin-bottom:8px;">📚 Historial General de Registros</h4>
+      <div id="listaHistorial"></div>
+    </div>
+  </div>
+
+  <!-- Banner PWA / Instalación -->
+  <div id="install-container" class="card" style="display:none; text-align:center; margin-top:20px;">
+    <p style="font-size:0.8rem; margin-bottom:8px;">Instalá esta App en tu dispositivo para usarla sin conexión.</p>
+    <button id="install-button" class="btn-primario" style="width:auto; padding:5px 15px; font-size:0.8rem;">Instalar Aplicación</button>
+    <button onclick="cerrarBannerPWA()" class="btn-secundario" style="font-size:0.75rem; margin-left:5px;">Ahora no</button>
+  </div>
+
+  <div id="footerPWAOption" class="hidden" style="text-align:center; margin-top:15px; font-size:0.75rem; color:var(--texto-secundario);">
+    <a href="#" onclick="reabrirBannerPWA(); return false;" style="color:var(--azul-texto);">📲 Reinstalar o agregar a pantalla inicio</a>
+  </div>
+
+</div>
+
+<!-- SCRIPT COMPLETO CON ARQUITECTURA DISTRIBUIDA Y REORDENAMIENTO DE TAREAS -->
+<script>
+const SUPABASE_URL = "https://hpgqzrnwlynnwnwhcdpw.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_M6-BdYv-_HLUTop89EhBaw_MXo8PUfb";
+
+let supabase = null;
+let usuarioActual = null;
+let registroActualGlobal = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(()=>{}); });
+}
+
+// === INICIALIZACIÓN Y LISTENERS DE CONECTIVIDAD ===
+window.addEventListener('DOMContentLoaded', async () => {
+  const savedKey = localStorage.getItem('spark_user_api_key') || '';
+  document.getElementById('userApiKey').value = savedKey;
+
+  try {
+    if (window.supabase) {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        actualizarUIUsuario(user);
+        await sincronizarRegistrosPendientes();
+      }
     }
+  } catch(e) { console.warn("Supabase fallback:", e); }
+  evaluarVisibilidadPWA();
+});
 
-    function answerQ2(hasFriction) {
-      q2Box.style.display = 'none';
-      if (hasFriction) q3Box.style.display = 'block';
-      else saveTask();
+window.addEventListener('online', async () => {
+  console.log("Conexión restablecida. Sincronizando datos...");
+  if (supabase && usuarioActual) {
+    await sincronizarRegistrosPendientes();
+  }
+});
+
+function guardarKeyLocal() {
+  const val = document.getElementById('userApiKey').value.trim();
+  localStorage.setItem('spark_user_api_key', val);
+}
+
+function toggleAyudaAPI() {
+  document.getElementById('ayudaAPIBox').classList.toggle('hidden');
+}
+
+function actualizarUIUsuario(user) {
+  usuarioActual = user;
+  if (user) {
+    document.getElementById('txtEstadoSesion').innerText = `👤 Sesión: ${user.email}`;
+    document.getElementById('btnAuthAction').innerText = "Cerrar Sesión";
+    if (!document.getElementById('inputEmailPaciente').value) {
+      document.getElementById('inputEmailPaciente').value = user.email;
     }
-
-    function addMicroInputField() {
-      const container = document.getElementById('microInputsContainer');
-      const count = container.querySelectorAll('input').length + 1;
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.className = 'micro-input-field';
-      input.placeholder = `Acción ${count}...`;
-      container.appendChild(input);
+    if (!document.getElementById('inputExportEmail').value) {
+      document.getElementById('inputExportEmail').value = user.email;
     }
+  } else {
+    document.getElementById('txtEstadoSesion').innerText = "🔒 Modo Invitado (Sin guardar en la nube)";
+    document.getElementById('btnAuthAction').innerText = "Ingresar con Email";
+  }
+}
 
-    function saveTask() {
-      const microFields = document.querySelectorAll('.micro-input-field');
-      currentTask.microSteps = [];
-      microFields.forEach(f => {
-        let val = f.value.trim();
-        if (val !== "") {
-          // Limpiar si el usuario escribió "Paso X:" manualmente
-          val = val.replace(/^Paso\s*\d+:\s*/i, '');
-          currentTask.microSteps.push({ text: val, done: false });
+async function gestionarSesion() {
+  if (usuarioActual) {
+    if (supabase) await supabase.auth.signOut();
+    usuarioActual = null;
+    actualizarUIUsuario(null);
+  } else {
+    const email = prompt("Ingresá tu correo para el enlace de acceso:");
+    if (!email || !supabase) return;
+    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+    if (error) alert("Error: " + error.message);
+    else alert("📩 ¡Revisá tu correo!");
+  }
+}
+
+function cambiarVista(vista) {
+  if (vista === 'nuevo') {
+    document.getElementById('vistaNuevo').classList.remove('hidden');
+    document.getElementById('vistaHistorial').classList.add('hidden');
+    document.getElementById('tabNuevo').classList.add('active');
+    document.getElementById('tabHistorial').classList.remove('active');
+  } else {
+    document.getElementById('vistaNuevo').classList.add('hidden');
+    document.getElementById('vistaHistorial').classList.remove('hidden');
+    document.getElementById('tabNuevo').classList.remove('active');
+    document.getElementById('tabHistorial').classList.add('active');
+    cargarHistorialUI();
+  }
+}
+
+function actualizarEmociones() { document.getElementById('valEmo1').innerText = document.getElementById('sliderEmo1').value + '%'; }
+function actualizarPost() { document.getElementById('valEmo1Post').innerText = document.getElementById('sliderEmo1Post').value + '%'; }
+
+// === ANALIZADOR HÍBRIDO ===
+async function analizarRegistroHibrido() {
+  const entrada = document.getElementById('textoEntrada').value.trim();
+  if (!entrada) { alert("Por favor, ingresá la situación."); return; }
+
+  const apiKey = document.getElementById('userApiKey').value.trim();
+  const hoy = new Date().toLocaleDateString('es-AR') + ' - ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  document.getElementById('metaFecha').innerText = `Fecha: ${hoy}`;
+
+  if (apiKey) {
+    document.getElementById('btnAnalizar').innerText = "Procesando con IA...";
+    try {
+      await analizarConIAMultiProveedor(entrada, apiKey);
+    } catch(err) {
+      console.warn("Fallo en API Key:", err);
+      alert("No se pudo procesar la solicitud con la API Key ingresada. Se ejecutará el Motor Local Dinámico.");
+      document.getElementById('metaModo').innerText = "Modo: Motor Local (Fallback)";
+      ejecutarMotorLocalAvanzado(entrada);
+    } finally {
+      document.getElementById('btnAnalizar').innerText = "Comprender este momento";
+    }
+  } else {
+    document.getElementById('metaModo').innerText = "Modo: Motor Local Dinámico";
+    ejecutarMotorLocalAvanzado(entrada);
+  }
+}
+
+// === MOTOR MULTIPROVEEDOR IA ===
+async function analizarConIAMultiProveedor(promptUsuario, apiKey) {
+  const promptSistema = `Eres un terapeuta experto en Terapia Cognitivo-Conductual (TCC). Analiza el texto del paciente y devuelve ÚNICAMENTE un objeto JSON válido con este formato exacto:
+{
+  "situacion": "Resumen objetivo del detonante",
+  "pensamiento": "El pensamiento automático distorsionado",
+  "conducta": "Consecuencia conductual o fisiológica",
+  "distorsion": "Nombre de la distorsión cognitiva identificada",
+  "respuestaRacional": "Reestructuración cognitiva basada en TCC",
+  "preguntaSocratica": "Una pregunta socrática reflexiva e incisiva"
+}`;
+
+  let parsed = null;
+  let proveedorNombre = "";
+
+  if (apiKey.startsWith("AIza")) {
+    proveedorNombre = "Gemini AI";
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: `${promptSistema}\n\nTexto ingresado por el paciente: "${promptUsuario}"` }] }],
+        generationConfig: { responseMimeType: "application/json" }
+      })
+    });
+    const data = await res.json();
+    parsed = JSON.parse(data.candidates[0].content.parts[0].text);
+
+  } else if (apiKey.startsWith("gsk_")) {
+    proveedorNombre = "Groq (Llama 3)";
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "system", content: promptSistema }, { role: "user", content: promptUsuario }],
+        response_format: { type: "json_object" },
+        temperature: 0.3
+      })
+    });
+    const data = await res.json();
+    parsed = JSON.parse(data.choices[0].message.content);
+
+  } else if (apiKey.startsWith("sk-ant-")) {
+    proveedorNombre = "Claude AI";
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+        "dangerously-allow-browser-headers": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-3-haiku-20240307",
+        max_tokens: 1000,
+        system: promptSistema,
+        messages: [{ role: "user", content: promptUsuario }]
+      })
+    });
+    const data = await res.json();
+    parsed = JSON.parse(data.content[0].text);
+
+  } else {
+    proveedorNombre = "OpenAI (GPT-4o)";
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [{ role: "system", content: promptSistema }, { role: "user", content: promptUsuario }],
+        temperature: 0.4
+      })
+    });
+    const data = await res.json();
+    parsed = JSON.parse(data.choices[0].message.content);
+  }
+
+  document.getElementById('metaModo').innerText = `Modo: ${proveedorNombre}`;
+  mostrarResultadoEnUI(parsed.situacion, parsed.pensamiento, parsed.conducta, parsed.distorsion, parsed.respuestaRacional, parsed.preguntaSocratica);
+}
+
+// === MOTOR LOCAL DINÁMICO ===
+function ejecutarMotorLocalAvanzado(entrada) {
+  const txtLower = entrada.toLowerCase();
+  let extractoPensamiento = entrada.length > 80 ? entrada.substring(0, 80) + "..." : entrada;
+
+  let situacion = entrada;
+  let pensamiento = `Pienso que "${extractoPensamiento}" y que la situación se va a escapar de mi control.`;
+  let conducta = "Tensión física, inquietud constante, aislamiento o búsqueda repetitiva de reaseguro.";
+  let distorsion = "Catastrofización / Pensamiento Todo-o-Nada";
+  let respuestaRacional = "Analizar las cosas en sus extremos absolutistas aumenta la ansiedad. Es importante separar los hechos objetivos del temor anticipatorio.";
+  let preguntaSocratica = "¿Qué evidencias concretas respaldan este pensamiento y cuáles indican que la situación tiene otros matices o soluciones?";
+
+  if (/\b(vecino|vecinos|pelea|peleas|discusio|golpear|ira|rabia|bronca|gritar|maldito|injusto|conflicto)\b/.test(txtLower)) {
+    pensamiento = `Pienso que no puedo tolerar esta falta de respeto/conflicto y que debo reaccionar de manera drástica.`;
+    conducta = "Elevación de la frecuencia cardíaca, rumiación de venganza o confrontación, rigidez muscular.";
+    distorsion = "Tolerancia Frustrada / Deberías y Demandas Absolutas";
+    respuestaRacional = "Aunque la conducta ajena sea molesta e injusta, reaccionar desde la ira intensa puede complicar más las cosas. Puedo establecer límites firmes sin poner en riesgo mi tranquilidad.";
+    preguntaSocratica = "¿Reaccionar con el impulso primario de la ira resuelve el problema a largo plazo o aumenta las consecuencias negativas para mí?";
+
+  } else if (/\b(perra|perrita|perro|perrito|mascota|enferm|morir|muerte|veterinari|hospital|diagnostico|dolor)\b/.test(txtLower)) {
+    pensamiento = `Pienso que la situación médica empeorará fatalmente y que no voy a poder soportarlo.`;
+    conducta = "Llanto, hipervigilancia de síntomas, presión en el pecho y paralización.";
+    distorsion = "Catastrofización (Sobestimación del Peligro)";
+    respuestaRacional = "La preocupación anticipada no acelera la curación ni cambia el diagnóstico. Puedo enfocarme en dar los pasos médicos objetivos en lugar de sufrir el peor escenario de antemano.";
+    preguntaSocratica = "¿Tengo certezas absolutas del peor resultado hoy, o estoy respondiendo al miedo del futuro?";
+
+  } else if (/\b(odian|rechazan|rechazo|miran|vergüenza|ridiculo|quedar mal|opinio|critica|aislar|nadie me quiere)\b/.test(txtLower)) {
+    pensamiento = `Pienso que las personas me están juzgando negativamente o que me rechazan por completo.`;
+    conducta = "Evitación del contacto visual, retraimiento social y rumiación post-interacción.";
+    distorsion = "Lectura de Mente / Lectura del Futuro Negativa";
+    respuestaRacional = "No puedo leer la mente de los demás. Lo que asumo que otros piensan suele ser una proyección de mis propias inseguridades.";
+    preguntaSocratica = "¿Qué datos objetivos comprueban que piensan eso de mí, o estoy asumiendo intenciones sin preguntar?";
+
+  } else if (/\b(trabajo|jefe|despido|plata|dinero|alquiler|deuda|deudas|no llego|futuro|fracaso|inutil)\b/.test(txtLower)) {
+    pensamiento = `Pienso que no voy a ser capaz de afrontar las exigencias económicas/laborales y fracasaré.`;
+    conducta = "Inquietud motora, dificultad para conciliar el sueño, procrastinación por abrumamiento.";
+    distorsion = "Etiquetado Negativo / Visión de Túnel";
+    respuestaRacional = "Atravesar una fase de incertidumbre económica o laboral es desafiante, pero no define mi capacidad total de resolución. Concentrarme en acciones pequeñas de hoy reduce el abrumamiento.";
+    preguntaSocratica = "¿Qué pequeña acción concreta está a mi alcance hoy para abordar esta dificultad paso a paso?";
+  }
+
+  mostrarResultadoEnUI(situacion, pensamiento, conducta, distorsion, respuestaRacional, preguntaSocratica);
+}
+
+function mostrarResultadoEnUI(sit, pens, cond, dist, resp, socra) {
+  document.getElementById('resPaso1').innerText = sit;
+  document.getElementById('resPaso2').innerText = pens;
+  document.getElementById('resPaso4').innerText = cond;
+  document.getElementById('resPaso5').innerText = dist;
+  document.getElementById('resPaso6').innerText = resp;
+  document.getElementById('resSocratica').innerText = `"${socra}"`;
+
+  document.getElementById('bloqueResultado').classList.remove('hidden');
+  document.getElementById('bloqueResultado').scrollIntoView({ behavior: 'smooth' });
+}
+
+// === GUARDADO LOCAL CON UUID V4 Y METADATOS DE SINCRONIZACIÓN ===
+async function guardarEIntegrarInforme() {
+  const preEmo = parseInt(document.getElementById('sliderEmo1').value) || 0;
+  const postEmo = parseInt(document.getElementById('sliderEmo1Post').value) || 0;
+  const brecha = postEmo - preEmo;
+
+  const nombrePac = document.getElementById('inputNombrePaciente').value.trim();
+  const emailPac = document.getElementById('inputEmailPaciente').value.trim();
+  const fechaIso = new Date().toISOString();
+
+  const registroUuid = (typeof crypto !== 'undefined' && crypto.randomUUID) 
+    ? crypto.randomUUID() 
+    : 'reg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+
+  const registro = {
+    id: registroUuid,
+    fecha: fechaIso,
+    updated_at: fechaIso,
+    synced: false,
+    deleted: false,
+    tipo_tarea: 'palanca', // Valor por defecto categorizable
+    paciente_nombre: nombrePac,
+    paciente_email: emailPac,
+    situacion: document.getElementById('resPaso1').innerText,
+    pensamiento_automatico: document.getElementById('resPaso2').innerText,
+    pre_emocion: preEmo,
+    post_emocion: postEmo,
+    brecha_emocional: brecha,
+    emociones_texto: `Angustia / Malestar: ${preEmo}% | Post: ${postEmo}%`,
+    conducta: document.getElementById('resPaso4').innerText,
+    distorsiones: document.getElementById('resPaso5').innerText,
+    respuesta_racional: document.getElementById('resPaso6').innerText,
+    reencuadre_cognitivo: document.getElementById('reencuadreCognitivo').value || 'Sin reencuadre',
+    reflexion_emocional: document.getElementById('reflexionEmocional').value || 'Sin reflexión',
+    foco_terapia: document.getElementById('focoTerapia').value || 'Evaluación en sesión'
+  };
+
+  registroActualGlobal = registro;
+
+  let locales = JSON.parse(localStorage.getItem('spark_registros_tcc') || '[]');
+  locales.unshift(registro);
+  localStorage.setItem('spark_registros_tcc', JSON.stringify(locales));
+
+  if (supabase && usuarioActual) {
+    await sincronizarRegistrosPendientes();
+  }
+
+  const hoy = new Date().toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('infFecha').innerText = `Fecha: ${hoy}`;
+  
+  let textoDatosArr = [];
+  if (nombrePac) textoDatosArr.push(`Paciente: ${nombrePac}`);
+  if (emailPac) textoDatosArr.push(`Email: ${emailPac}`);
+  document.getElementById('infPacienteDatos').innerText = textoDatosArr.join(" | ");
+
+  document.getElementById('infSituacion').innerText = registro.situacion;
+  document.getElementById('infPensamiento').innerText = registro.pensamiento_automatico;
+  document.getElementById('infEmociones').innerText = registro.emociones_texto;
+  document.getElementById('infConducta').innerText = registro.conducta;
+  document.getElementById('infDistorsiones').innerText = registro.distorsiones;
+  document.getElementById('infRespuestaRacional').innerText = registro.respuesta_racional;
+  document.getElementById('infFoco').innerText = registro.foco_terapia;
+
+  document.getElementById('seccionPreparacionSesion').style.display = 'none';
+  const vistaPrevia = document.getElementById('vistaPreviaInforme');
+  vistaPrevia.classList.remove('hidden');
+  vistaPrevia.scrollIntoView({ behavior: 'smooth' });
+}
+
+// === FUNCIONALIDAD DE REORDENAMIENTO DE TAREAS PRINCIPALES ===
+async function moverTareaPrincipal(idTarea, direccion, tipoListado) {
+  let locales = JSON.parse(localStorage.getItem('spark_registros_tcc') || '[]');
+  
+  // Filtrar según el tipo indicado
+  let grupo = locales.filter(r => !r.deleted && (
+    tipoListado === 'palancas' 
+      ? (r.tipo_tarea === 'palanca' || r.tipo_tarea === 'palancas' || !r.tipo_tarea)
+      : (r.tipo_tarea === 'mantenimiento')
+  ));
+
+  const index = grupo.findIndex(t => String(t.id) === String(idTarea));
+  if (index === -1) return;
+
+  if (direccion === 'subir' && index === 0) return;
+  if (direccion === 'bajar' && index === grupo.length - 1) return;
+
+  const targetIndex = direccion === 'subir' ? index - 1 : index + 1;
+
+  // Intercambiar posiciones
+  const temp = grupo[index];
+  grupo[index] = grupo[targetIndex];
+  grupo[targetIndex] = temp;
+
+  const ahoraIso = new Date().toISOString();
+  grupo[index].updated_at = ahoraIso;
+  grupo[index].synced = false;
+  grupo[targetIndex].updated_at = ahoraIso;
+  grupo[targetIndex].synced = false;
+
+  const mapaModificados = new Map(grupo.map(item => [item.id, item]));
+  locales = locales.map(item => mapaModificados.has(item.id) ? mapaModificados.get(item.id) : item);
+
+  localStorage.setItem('spark_registros_tcc', JSON.stringify(locales));
+  cargarHistorialUI();
+
+  if (supabase && usuarioActual) {
+    await sincronizarRegistrosPendientes();
+  }
+}
+
+// === MOTOR DE SINCRONIZACIÓN BIDIRECCIONAL (LWW) ===
+async function sincronizarRegistrosPendientes() {
+  if (!supabase || !usuarioActual) return;
+
+  let locales = JSON.parse(localStorage.getItem('spark_registros_tcc') || '[]');
+  const pendientes = locales.filter(r => !r.synced && !r.deleted);
+
+  if (pendientes.length > 0) {
+    const payload = pendientes.map(r => ({
+      id: r.id,
+      user_id: usuarioActual.id,
+      created_at: r.fecha,
+      updated_at: r.updated_at || r.fecha,
+      situacion: r.situacion,
+      pensamiento_automatico: r.pensamiento_automatico,
+      emociones: r.emociones_texto,
+      pre_emocion: r.pre_emocion,
+      post_emocion: r.post_emocion,
+      brecha_emocional: r.brecha_emocional,
+      conducta: r.conducta,
+      distorsiones: r.distorsiones,
+      respuesta_racional: r.respuesta_racional,
+      reencuadre_cognitivo: r.reencuadre_cognitivo,
+      reflexion_emocional: r.reflexion_emocional,
+      foco_terapia: r.foco_terapia,
+      paciente_nombre: r.paciente_nombre,
+      paciente_email: r.paciente_email
+    }));
+
+    const { error } = await supabase.from('registros_tcc').upsert(payload, { onConflict: 'id' });
+
+    if (!error) {
+      locales = locales.map(r => {
+        if (pendientes.some(p => p.id === r.id)) {
+          return { ...r, synced: true };
+        }
+        return r;
+      });
+      localStorage.setItem('spark_registros_tcc', JSON.stringify(locales));
+    } else {
+      console.warn("Error en Push:", error);
+    }
+  }
+
+  try {
+    const { data: remotos, error: pullError } = await supabase
+      .from('registros_tcc')
+      .select('*')
+      .eq('user_id', usuarioActual.id);
+
+    if (!pullError && remotos) {
+      const mapaLocales = new Map(locales.map(item => [item.id, item]));
+
+      remotos.forEach(rem => {
+        const local = mapaLocales.get(rem.id);
+        const remotoObj = {
+          id: rem.id,
+          fecha: rem.created_at || rem.fecha,
+          updated_at: rem.updated_at || rem.created_at,
+          synced: true,
+          deleted: false,
+          paciente_nombre: rem.paciente_nombre || '',
+          paciente_email: rem.paciente_email || '',
+          situacion: rem.situacion,
+          pensamiento_automatico: rem.pensamiento_automatico,
+          pre_emocion: rem.pre_emocion,
+          post_emocion: rem.post_emocion,
+          brecha_emocional: rem.brecha_emocional,
+          emociones_texto: rem.emociones,
+          conducta: rem.conducta,
+          distorsiones: rem.distorsiones,
+          respuesta_racional: rem.respuesta_racional,
+          reencuadre_cognitivo: rem.reencuadre_cognitivo,
+          reflexion_emocional: rem.reflexion_emocional,
+          foco_terapia: rem.foco_terapia
+        };
+
+        if (!local) {
+          mapaLocales.set(rem.id, remotoObj);
+        } else if (!local.synced) {
+          const localTime = new Date(local.updated_at || local.fecha).getTime();
+          const remoteTime = new Date(rem.updated_at || rem.created_at).getTime();
+          if (remoteTime > localTime) {
+            mapaLocales.set(rem.id, remotoObj);
+          }
         }
       });
 
-      const newTask = {
-        id: Date.now(),
-        title: currentTask.title,
-        isLever: currentTask.isLever,
-        microSteps: currentTask.microSteps,
-        completed: false,
-        completedAt: null
-      };
+      const listaFusionada = Array.from(mapaLocales.values())
+        .filter(r => !r.deleted);
 
-      tasks.push(newTask);
-      updateStorageAndRender();
-      resetWizard();
-      taskInput.value = "";
+      localStorage.setItem('spark_registros_tcc', JSON.stringify(listaFusionada));
     }
+  } catch (err) {
+    console.warn("Fallo en Pull:", err);
+  }
+}
 
-    function resetWizard() {
-      q1Box.style.display = 'none';
-      q2Box.style.display = 'none';
-      q3Box.style.display = 'none';
-      document.getElementById('microInputsContainer').innerHTML = '<input type="text" class="micro-input-field" placeholder="Contactar al mecánico..." />';
-      currentTask = { title: "", isLever: false, microSteps: [] };
+// === CARGAR Y RENDERIZAR HISTORIAL CON BOTONES DE SUBIR/BAJAR ===
+async function cargarHistorialUI() {
+  if (supabase && usuarioActual) {
+    await sincronizarRegistrosPendientes();
+  }
+
+  const contPalancas = document.getElementById('listaPalancas');
+  const contMantenimiento = document.getElementById('listaMantenimiento');
+  const contHistorial = document.getElementById('listaHistorial');
+  const locales = JSON.parse(localStorage.getItem('spark_registros_tcc') || '[]').filter(r => !r.deleted);
+
+  if (locales.length === 0) {
+    const msgVacio = `<p style="font-size:0.8rem; color: var(--texto-secundario); text-align:center;">No hay registros o tareas guardadas.</p>`;
+    if (contPalancas) contPalancas.innerHTML = msgVacio;
+    if (contMantenimiento) contMantenimiento.innerHTML = msgVacio;
+    if (contHistorial) contHistorial.innerHTML = msgVacio;
+    return;
+  }
+
+  const renderItem = (item, index, total, tipo) => {
+    const pre = typeof item.pre_emocion === 'number' ? item.pre_emocion : 0;
+    const post = typeof item.post_emocion === 'number' ? item.post_emocion : 0;
+    const b = item.brecha_emocional !== undefined && !isNaN(item.brecha_emocional) ? item.brecha_emocional : (post - pre);
+    const signo = b > 0 ? '+' : '';
+    const textoBrecha = `Brecha: ${signo}${b}%`;
+    const indicadorSync = item.synced ? '☁️' : '📲 (Local)';
+
+    const esPrimero = index === 0;
+    const esUltimo = index === total - 1;
+
+    return `
+      <div style="background: #07090e; border: 1px solid var(--borde-card); border-radius:6px; padding:10px; margin-bottom:10px; font-size:0.82rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            ${tipo ? `
+              <button onclick="moverTareaPrincipal('${item.id}', 'subir', '${tipo}')" ${esPrimero ? 'disabled style="opacity:0.3; cursor:default;"' : ''} class="btn-secundario" style="padding:2px 6px; font-size:0.7rem;" title="Subir prioridad">▲</button>
+              <button onclick="moverTareaPrincipal('${item.id}', 'bajar', '${tipo}')" ${esUltimo ? 'disabled style="opacity:0.3; cursor:default;"' : ''} class="btn-secundario" style="padding:2px 6px; font-size:0.7rem;" title="Bajar prioridad">▼</button>
+            ` : ''}
+            <span style="color: var(--azul-texto); font-weight:bold;">${new Date(item.fecha).toLocaleDateString()} - ${new Date(item.fecha).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+          </div>
+          <div>
+            <span class="brecha-tag">${textoBrecha}</span>
+            <span style="font-size:0.75rem; color: var(--texto-secundario); margin-left:5px;">${indicadorSync}</span>
+          </div>
+        </div>
+
+        ${item.paciente_nombre || item.paciente_email ? `<div style="font-size:0.75rem; color: var(--texto-secundario); margin-bottom: 4px;">👤 ${item.paciente_nombre || ''} ${item.paciente_email ? `(${item.paciente_email})` : ''}</div>` : ''}
+        <div style="margin: 4px 0;"><strong>Situación:</strong> ${item.situacion}</div>
+        <div style="color: #f85149; margin-bottom: 8px;"><strong>Distorsión:</strong> ${item.distorsiones}</div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <button onclick='imprimirOExportarPDF(${JSON.stringify(item)})' class="btn-secundario" style="font-size:0.75rem; padding:4px 8px; width:auto; margin:0;">📥 PDF</button>
+          <button onclick="borrarRegistroHistorial('${item.id}')" class="btn-borrar">🗑️ Borrar</button>
+        </div>
+      </div>
+    `;
+  };
+
+  // Clasificación
+  const palancas = locales.filter(r => r.tipo_tarea === 'palanca' || r.tipo_tarea === 'palancas' || !r.tipo_tarea);
+  const mantenimiento = locales.filter(r => r.tipo_tarea === 'mantenimiento');
+
+  if (contPalancas) {
+    contPalancas.innerHTML = palancas.length > 0 
+      ? palancas.map((item, idx) => renderItem(item, idx, palancas.length, 'palancas')).join('')
+      : `<p style="font-size:0.8rem; color: var(--texto-secundario); text-align:center;">Sin tareas palanca.</p>`;
+  }
+
+  if (contMantenimiento) {
+    contMantenimiento.innerHTML = mantenimiento.length > 0 
+      ? mantenimiento.map((item, idx) => renderItem(item, idx, mantenimiento.length, 'mantenimiento')).join('')
+      : `<p style="font-size:0.8rem; color: var(--texto-secundario); text-align:center;">Sin tareas de mantenimiento.</p>`;
+  }
+
+  if (contHistorial) {
+    contHistorial.innerHTML = locales.map((item, idx) => renderItem(item, idx, locales.length, null)).join('');
+  }
+}
+
+async function borrarRegistroHistorial(id) {
+  if (!confirm("¿Estás seguro de que querés borrar este registro del historial?")) return;
+
+  let locales = JSON.parse(localStorage.getItem('spark_registros_tcc') || '[]');
+  
+  locales = locales.map(item => {
+    if (String(item.id) === String(id)) {
+      return { ...item, deleted: true, synced: false, updated_at: new Date().toISOString() };
     }
+    return item;
+  });
 
-    function toggleMicroStep(taskId, stepIndex) {
-      const task = tasks.find(t => t.id === taskId);
-      if (task) {
-        task.microSteps[stepIndex].done = !task.microSteps[stepIndex].done;
-        updateStorageAndRender();
-      }
+  localStorage.setItem('spark_registros_tcc', JSON.stringify(locales));
+
+  if (supabase && usuarioActual) {
+    try {
+      await supabase.from('registros_tcc').delete().eq('id', id);
+    } catch(e) { console.warn("Error al borrar en Supabase:", e); }
+  }
+
+  cargarHistorialUI();
+}
+
+function imprimirOExportarPDF(reg) {
+  const r = reg || registroActualGlobal;
+  if (!r) return;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+  let y = 20;
+
+  doc.setFont("helvetica", "bold"); doc.setFontSize(11);
+  doc.text("REGISTRO COGNITIVO TCC & PREPARACIÓN DE SESIÓN", 15, y);
+  y += 5;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(100);
+  doc.text(`Fecha: ${new Date(r.fecha || Date.now()).toLocaleDateString()}`, 15, y);
+  
+  let datosArr = [];
+  if (r.paciente_nombre) datosArr.push(`Paciente: ${r.paciente_nombre}`);
+  if (r.paciente_email) datosArr.push(`Email: ${r.paciente_email}`);
+
+  if (datosArr.length > 0) {
+    y += 4;
+    doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(0);
+    doc.text(datosArr.join(" | "), 15, y);
+  }
+
+  y += 4; doc.line(15, y, 195, y); y += 7;
+
+  const agregarCampo = (titulo, texto) => {
+    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(0);
+    doc.text(titulo, 15, y); y += 4;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(30);
+    const lineas = doc.splitTextToSize(texto || 'Sin especificar', 175);
+    doc.text(lineas, 15, y);
+    y += (lineas.length * 4) + 3.5;
+    if (y > 270) { doc.addPage(); y = 20; }
+  };
+
+  const emoLimpia = r.emociones_texto ? r.emociones_texto.replace('➔', 'a') : `Pre: ${r.pre_emocion || 0}% | Post: ${r.post_emocion || 0}%`;
+
+  agregarCampo("1. Situación (Activador):", r.situacion);
+  agregarCampo("2. Pensamiento Automático:", r.pensamiento_automatico);
+  agregarCampo("3. Evolución Emocional:", emoLimpia);
+  agregarCampo("4. Conducta:", r.conducta);
+  agregarCampo("5. Distorsión Cognitiva:", r.distorsiones);
+  agregarCampo("6. Respuesta Racional:", r.respuesta_racional);
+  agregarCampo("7. Foco para Terapia:", r.foco_terapia);
+
+  doc.save(`Registro_TCC_${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+function exportarConsolidadoPDF(periodo) {
+  const locales = JSON.parse(localStorage.getItem('spark_registros_tcc') || '[]').filter(r => !r.deleted);
+  const ahora = new Date();
+  const limiteDias = periodo === 'semana' ? 7 : 30;
+
+  const filtrados = locales.filter(item => {
+    const diff = (ahora - new Date(item.fecha)) / (1000 * 60 * 60 * 24);
+    return diff <= limiteDias;
+  });
+
+  if (filtrados.length === 0) {
+    alert(`No tenés registros almacenados en los últimos ${limiteDias} días.`);
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+  let y = 20;
+
+  doc.setFont("helvetica", "bold"); doc.setFontSize(11);
+  doc.text(`CONSOLIDADO TCC - RANGO: ÚLTIMO ${periodo.toUpperCase()}`, 15, y);
+  y += 5;
+  
+  let nombreExp = document.getElementById('inputExportNombre').value.trim();
+  let emailExp = document.getElementById('inputExportEmail').value.trim();
+
+  if (!nombreExp && !emailExp) {
+    const ultimoConDatos = filtrados.find(f => f.paciente_nombre || f.paciente_email);
+    if (ultimoConDatos) {
+      nombreExp = ultimoConDatos.paciente_nombre || "";
+      emailExp = ultimoConDatos.paciente_email || "";
     }
+  }
 
-    function editTaskTitle(taskId) {
-      const task = tasks.find(t => t.id === taskId);
-      if (task) {
-        const newTitle = prompt("Editar título de la tarea:", task.title);
-        if (newTitle && newTitle.trim() !== "") {
-          task.title = newTitle.trim();
-          updateStorageAndRender();
-        }
-      }
-    }
+  let datosExpArr = [];
+  if (nombreExp) datosExpArr.push(`Paciente: ${nombreExp}`);
+  if (emailExp) datosExpArr.push(`Email: ${emailExp}`);
 
-    function editMicroStep(taskId, stepIndex) {
-      const task = tasks.find(t => t.id === taskId);
-      if (task) {
-        let currentText = task.microSteps[stepIndex].text;
-        // Limpia prefijo duplicado al editar si existía
-        currentText = currentText.replace(/^Paso\s*\d+:\s*/i, '');
-        const newText = prompt("Editar micro-paso:", currentText);
-        if (newText && newText.trim() !== "") {
-          task.microSteps[stepIndex].text = newText.trim();
-          updateStorageAndRender();
-        }
-      }
-    }
+  if (datosExpArr.length > 0) {
+    doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(0);
+    doc.text(datosExpArr.join(" | "), 15, y);
+    y += 4;
+  }
 
-    function moveMicroStep(taskId, stepIndex, direction) {
-      const task = tasks.find(t => t.id === taskId);
-      if (task) {
-        const newIndex = stepIndex + direction;
-        if (newIndex >= 0 && newIndex < task.microSteps.length) {
-          const temp = task.microSteps[stepIndex];
-          task.microSteps[stepIndex] = task.microSteps[newIndex];
-          task.microSteps[newIndex] = temp;
-          updateStorageAndRender();
-        }
-      }
-    }
+  doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(100);
+  doc.text(`Generado el: ${ahora.toLocaleDateString()} - Total Registros: ${filtrados.length}`, 15, y);
+  y += 4; doc.line(15, y, 195, y); y += 7;
 
-    function deleteMicroStep(taskId, stepIndex) {
-      const task = tasks.find(t => t.id === taskId);
-      if (task && confirm("¿Borrar este micro-paso?")) {
-        task.microSteps.splice(stepIndex, 1);
-        updateStorageAndRender();
-      }
-    }
+  filtrados.forEach((r, idx) => {
+    if (y > 240) { doc.addPage(); y = 20; }
+    doc.setFont("helvetica", "bold"); doc.setFontSize(9.5); doc.setTextColor(0, 86, 179);
+    doc.text(`REGISTRO #${filtrados.length - idx} - ${new Date(r.fecha).toLocaleDateString()}`, 15, y);
+    y += 4.5;
 
-    function deleteTask(taskId) {
-      if (confirm("¿Borrar esta tarea completa y sus micro-pasos?")) {
-        tasks = tasks.filter(t => t.id !== taskId);
-        updateStorageAndRender();
-      }
-    }
+    doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(0);
+    doc.text("Situación:", 15, y); doc.setFont("helvetica", "normal");
+    let l1 = doc.splitTextToSize(r.situacion, 150); doc.text(l1, 35, y); y += (l1.length * 3.8) + 2;
 
-    function addMicroToExistingTask(taskId) {
-      const text = prompt("Ingrese el siguiente micro-paso:");
-      if (text && text.trim() !== "") {
-        const task = tasks.find(t => t.id === taskId);
-        if (task) {
-          let cleanText = text.trim().replace(/^Paso\s*\d+:\s*/i, '');
-          task.microSteps.push({ text: cleanText, done: false });
-          updateStorageAndRender();
-        }
-      }
-    }
+    doc.setFont("helvetica", "bold"); doc.text("Respuesta Racional:", 15, y); doc.setFont("helvetica", "normal");
+    let l2 = doc.splitTextToSize(r.respuesta_racional, 140); doc.text(l2, 45, y); y += (l2.length * 3.8) + 2;
 
-    function completeTask(taskId) {
-      const task = tasks.find(t => t.id === taskId);
-      if (task) {
-        task.completed = true;
-        const now = new Date();
-        task.completedAt = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        updateStorageAndRender();
-      }
-    }
+    doc.setFont("helvetica", "bold"); doc.text("Foco Terapia:", 15, y); doc.setFont("helvetica", "normal");
+    let l3 = doc.splitTextToSize(r.foco_terapia, 145); doc.text(l3, 40, y); y += (l3.length * 3.8) + 5;
 
-    function updateStorageAndRender() {
-      localStorage.setItem('north_lever_tasks', JSON.stringify(tasks));
-      renderLists();
-    }
+    doc.setDrawColor(220); doc.line(15, y, 195, y); y += 5;
+  });
 
-    function renderLists() {
-      const leverList = document.getElementById('leverList');
-      const maintList = document.getElementById('maintList');
-      const doneList = document.getElementById('doneList');
+  doc.save(`Consolidado_TCC_${periodo}_${ahora.toISOString().slice(0,10)}.pdf`);
+}
 
-      leverList.innerHTML = "";
-      maintList.innerHTML = "";
-      doneList.innerHTML = "";
+function compartirPorWhatsApp() {
+  if (!registroActualGlobal) return;
+  const r = registroActualGlobal;
+  const emoLimpia = r.emociones_texto ? r.emociones_texto.replace('➔', '->') : `Pre: ${r.pre_emocion}% | Post: ${r.post_emocion}%`;
 
-      let leverCount = 0;
-      let maintCount = 0;
+  const mensaje = 
+`📄 *REGISTRO COGNITIVO TCC & PREPARACIÓN DE SESIÓN*
+📌 *Fecha:* ${new Date(r.fecha || Date.now()).toLocaleDateString()}
+${r.paciente_nombre ? `👤 *Paciente:* ${r.paciente_nombre}\n` : ''}${r.paciente_email ? `✉️ *Email:* ${r.paciente_email}\n` : ''}
+*1. Situación (Activador):*
+${r.situacion}
 
-      tasks.forEach(task => {
-        const li = document.createElement('li');
+*2. Pensamiento Automático:*
+${r.pensamiento_automatico}
 
-        if (task.completed) {
-          li.className = 'task-item done';
-          li.innerHTML = `
-            <div class="task-header">
-              <span class="task-title">✓ ${task.title}</span>
-              <button class="icon-btn btn-danger" onclick="deleteTask(${task.id})">✕</button>
-            </div>
-            <span class="timestamp">Realizado el: ${task.completedAt}</span>
-          `;
-          doneList.appendChild(li);
-        } else {
-          li.className = `task-item ${task.isLever ? 'lever' : 'maint'}`;
-          
-          let microHtml = '';
-          if (task.microSteps && task.microSteps.length > 0) {
-            microHtml = '<div class="micro-container">';
-            task.microSteps.forEach((ms, idx) => {
-              // Sanitización rápida para mostrar sin duplicados
-              let cleanText = ms.text.replace(/^Paso\s*\d+:\s*/i, '');
-              
-              microHtml += `
-                <div class="micro-step ${ms.done ? 'completed' : ''}">
-                  <span class="micro-text">⚡ <strong>Paso ${idx + 1}:</strong> ${cleanText}</span>
-                  <div class="controls">
-                    <button class="icon-btn" onclick="moveMicroStep(${task.id}, ${idx}, -1)">▲</button>
-                    <button class="icon-btn" onclick="moveMicroStep(${task.id}, ${idx}, 1)">▼</button>
-                    <button class="icon-btn" onclick="editMicroStep(${task.id}, ${idx})">✎</button>
-                    <button class="icon-btn" onclick="toggleMicroStep(${task.id}, ${idx})">${ms.done ? '✓' : 'Hacer'}</button>
-                    <button class="icon-btn btn-danger" onclick="deleteMicroStep(${task.id}, ${idx})">✕</button>
-                  </div>
-                </div>
-              `;
-            });
-            microHtml += '</div>';
-          }
+*3. Evolución Emocional:*
+${emoLimpia}
 
-          let addMicroBtn = task.isLever ? `<button class="icon-btn" style="margin-top:8px;" onclick="addMicroToExistingTask(${task.id})">+ Paso</button>` : '';
+*4. Conducta:*
+${r.conducta}
 
-          li.innerHTML = `
-            <div class="task-header">
-              <span class="task-title">${task.title}</span>
-              <div class="controls">
-                <button class="icon-btn" onclick="editTaskTitle(${task.id})">✎</button>
-                <button class="icon-btn" style="color:var(--success); border-color:var(--success);" onclick="completeTask(${task.id})">Completar</button>
-                <button class="icon-btn btn-danger" onclick="deleteTask(${task.id})">✕</button>
-              </div>
-            </div>
-            ${microHtml}
-            ${addMicroBtn}
-          `;
+*5. Distorsión Cognitiva:*
+${r.distorsiones}
 
-          if (task.isLever) {
-            leverList.appendChild(li);
-            leverCount++;
-          } else {
-            maintList.appendChild(li);
-            maintCount++;
-          }
-        }
-      });
+*6. Respuesta Racional:*
+${r.respuesta_racional}
 
-      document.getElementById('leverCount').innerText = leverCount;
-      document.getElementById('maintCount').innerText = maintCount;
-    }
+*7. Foco para Terapia:*
+${r.foco_terapia}`;
 
-    renderLists();
-  </script>
+  window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
+}
+
+let deferredPrompt;
+const installContainer = document.getElementById('install-container');
+const installButton = document.getElementById('install-button');
+const footerPWAOption = document.getElementById('footerPWAOption');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); deferredPrompt = e; evaluarVisibilidadPWA();
+});
+
+function evaluarVisibilidadPWA() {
+  const esStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const cerradoPreviamente = localStorage.getItem('banner_pwa_cerrado') === 'true';
+  if (esStandalone) { installContainer.style.display = 'none'; footerPWAOption.classList.add('hidden'); return; }
+  footerPWAOption.classList.remove('hidden');
+  if (deferredPrompt && !cerradoPreviamente) installContainer.style.display = 'block';
+  else installContainer.style.display = 'none';
+}
+
+function cerrarBannerPWA() { installContainer.style.display = 'none'; localStorage.setItem('banner_pwa_cerrado', 'true'); }
+function reabrirBannerPWA() {
+  localStorage.removeItem('banner_pwa_cerrado');
+  if (deferredPrompt) installContainer.style.display = 'block';
+  else alert("Usa 'Agregar a la pantalla principal' desde el menú del navegador.");
+}
+
+if (installButton) {
+  installButton.addEventListener('click', async () => {
+    installContainer.style.display = 'none';
+    if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
+  });
+}
+</script>
 </body>
 </html>
