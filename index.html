@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>North & Lever | Sistema de Triage y Productividad</title>
+  <title>North & Lever | Sistema de Triage</title>
   <style>
     :root {
       --bg: #0f172a;
       --card-bg: #1e293b;
-      --accent-lever: #f59e0b; /* Dorado / Palanca 20% */
-      --accent-maint: #3b82f6; /* Azul / Mantenimiento 80% */
+      --accent-lever: #f59e0b;
+      --accent-maint: #3b82f6;
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --border: #334155;
@@ -19,56 +19,55 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 16px; max-width: 600px; margin: 0 auto; }
 
-    /* Header Norte */
     header { background: linear-gradient(135deg, #1e1b4b, #311b92); border: 1px solid #6366f1; border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: center; }
     header h1 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: #a5b4fc; margin-bottom: 4px; }
     header p { font-size: 1.1rem; font-weight: 700; color: #fff; }
 
-    /* Forms & Inputs */
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
-    .card h2 { font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-    input[type="text"] { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 1rem; margin-bottom: 12px; }
+    .card h2 { font-size: 1rem; margin-bottom: 12px; }
+    input[type="text"] { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 1rem; margin-bottom: 8px; }
     
-    /* Wizard / Preguntas */
     .quiz-box { display: none; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px; }
     .quiz-box p { font-size: 0.9rem; margin-bottom: 10px; color: #e2e8f0; }
     .btn-group { display: flex; gap: 8px; }
-    button { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    button { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: 60-0; cursor: pointer; }
     .btn-primary { background: var(--accent-lever); color: #000; }
     .btn-secondary { background: var(--border); color: #fff; }
     .btn-action { background: var(--success); color: #000; width: 100%; padding: 12px; font-size: 1rem; margin-top: 8px; }
+    .btn-add-micro { background: #334155; color: #f59e0b; padding: 6px 12px; font-size: 0.8rem; border-radius: 4px; margin-top: 6px; }
 
-    /* Secciones de Tareas */
     .section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; justify-content: space-between; }
     .title-lever { color: var(--accent-lever); }
     .title-maint { color: var(--accent-maint); }
+    .title-done { color: var(--success); margin-top: 24px; }
 
     .task-list { list-style: none; margin-bottom: 20px; }
-    .task-item { background: var(--card-bg); border-left: 4px solid var(--border); border-radius: 0 8px 8px 0; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
+    .task-item { background: var(--card-bg); border-left: 4px solid var(--border); border-radius: 0 8px 8px 0; padding: 12px; margin-bottom: 8px; }
     .task-item.lever { border-left-color: var(--accent-lever); }
     .task-item.maint { border-left-color: var(--accent-maint); }
-    .task-header { display: flex; justify-content: space-between; align-items: center; }
+    .task-item.done { border-left-color: var(--success); opacity: 0.8; }
+    .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .task-title { font-weight: 600; font-size: 0.95rem; }
     
-    /* Micro-pasos */
-    .micro-step { background: #0f172a; border: 1px dashed var(--accent-lever); border-radius: 6px; padding: 8px; font-size: 0.85rem; color: #fef08a; display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+    .micro-container { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+    .micro-step { background: #0f172a; border: 1px dashed var(--accent-lever); border-radius: 6px; padding: 6px 10px; font-size: 0.85rem; color: #fef08a; display: flex; justify-content: space-between; align-items: center; }
+    .micro-step.completed { text-decoration: line-through; opacity: 0.5; border-style: solid; border-color: var(--success); color: var(--success); }
+    
     .check-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; }
+    .timestamp { font-size: 0.75rem; color: var(--success); font-weight: normal; display: block; margin-top: 4px; }
   </style>
 </head>
 <body>
 
-  <!-- 1. NORTE ESTIMULANTE -->
   <header>
     <h1>Tu Norte (Valencia Máxima)</h1>
     <p>🎯 $1M USD + Libertad Financiera y Viajes con La Peque</p>
   </header>
 
-  <!-- 2. BUZÓN DE ENTRADA Y TRIAGE -->
   <div class="card">
     <h2>📥 Registrar Pendiente en el Sistema</h2>
     <input type="text" id="taskInput" placeholder="Ej: Hablar con el abogado por la sucesión..." />
 
-    <!-- PREGUNTA 1 -->
     <div id="q1Box" class="quiz-box">
       <p><strong>Filtro 1:</strong> ¿Esta tarea genera ingresos, destraba capital, elimina una gran fuga de ansiedad o construye tu libertad a largo plazo?</p>
       <div class="btn-group">
@@ -77,131 +76,213 @@
       </div>
     </div>
 
-    <!-- PREGUNTA 2 -->
     <div id="q2Box" class="quiz-box">
-      <p><strong>Filtro 2 (Resistencia):</strong> ¿Sentís fricción mental, pesadez o postergación para empezarla?</p>
+      <p><strong>Filtro 2 (Resistencia):</strong> ¿Sentís fricción mental o postergación para empezarla?</p>
       <div class="btn-group">
         <button class="btn-primary" onclick="answerQ2(true)">SÍ (Dividir en Dominó)</button>
         <button class="btn-secondary" onclick="answerQ2(false)">NO (Pasa Directo)</button>
       </div>
     </div>
 
-    <!-- PREGUNTA 3: MICRO-PASO -->
     <div id="q3Box" class="quiz-box">
-      <p><strong>Efecto Dominó:</strong> Escribí el primer micro-paso de 5 minutos que podrías hacer hoy sin cansancio:</p>
-      <input type="text" id="microInput" placeholder="Ej: Mandar 1 mensaje de WhatsApp pidiendo el estado del expediente." />
+      <p><strong>Efecto Dominó:</strong> Agregá los micro-pasos secuenciales (mínimo 1):</p>
+      <div id="microInputsContainer">
+        <input type="text" class="micro-input-field" placeholder="Paso 1: Contactar al mecánico..." />
+      </div>
+      <button class="btn-add-micro" onclick="addMicroInputField()">+ Agregar otro micro-paso</button>
       <button class="btn-action" onclick="saveTask()">Confirmar e Insertar en el Día</button>
     </div>
   </div>
 
-  <!-- 3. PANEL DE CONTROL DIARIO -->
   <main>
-    <!-- SECCIÓN 20% PALANCA -->
     <div class="section-title title-lever">
       <span>🎯 El 20% Palanca (Máxima Batería)</span>
-      <span id="leverCount">0 / 1</span>
+      <span id="leverCount">0</span>
     </div>
     <ul id="leverList" class="task-list"></ul>
 
-    <!-- SECCIÓN 80% MANTENIMIENTO -->
     <div class="section-title title-maint">
       <span>🧱 El 80% Mantenimiento (Energía Secundaria)</span>
-      <span id="maintCount">0 / 3</span>
+      <span id="maintCount">0</span>
     </div>
     <ul id="maintList" class="task-list"></ul>
+
+    <div class="section-title title-done">
+      <span>✅ Historial de Logros Completados</span>
+    </div>
+    <ul id="doneList" class="task-list"></ul>
   </main>
 
   <script>
-    let currentTask = { title: "", isLever: false, needsMicro: false, microStep: "" };
+    let tasks = JSON.parse(localStorage.getItem('north_lever_tasks')) || [];
+    let currentTask = { title: "", isLever: false, microSteps: [] };
 
     const taskInput = document.getElementById('taskInput');
     const q1Box = document.getElementById('q1Box');
     const q2Box = document.getElementById('q2Box');
     const q3Box = document.getElementById('q3Box');
 
-    // Iniciar flujo al escribir
-    taskInput.addEventListener('focus', () => {
-      if (taskInput.value.trim() !== "") {
-        q1Box.style.display = 'block';
-      }
-    });
-
-    taskInput.addEventListener('input', () => {
-      if (taskInput.value.trim() !== "") {
-        q1Box.style.display = 'block';
-      } else {
-        resetWizard();
-      }
-    });
+    taskInput.addEventListener('focus', () => { if (taskInput.value.trim() !== "") q1Box.style.display = 'block'; });
+    taskInput.addEventListener('input', () => { if (taskInput.value.trim() !== "") q1Box.style.display = 'block'; else resetWizard(); });
 
     function answerQ1(isPalanca) {
       currentTask.title = taskInput.value;
       currentTask.isLever = isPalanca;
       q1Box.style.display = 'none';
-
-      if (isPalanca) {
-        q2Box.style.display = 'block';
-      } else {
-        saveTask(); // Pasa directo a Mantenimiento
-      }
+      if (isPalanca) q2Box.style.display = 'block';
+      else saveTask();
     }
 
     function answerQ2(hasFriction) {
-      currentTask.needsMicro = hasFriction;
       q2Box.style.display = 'none';
+      if (hasFriction) q3Box.style.display = 'block';
+      else saveTask();
+    }
 
-      if (hasFriction) {
-        q3Box.style.display = 'block';
-      } else {
-        saveTask();
-      }
+    function addMicroInputField() {
+      const container = document.getElementById('microInputsContainer');
+      const count = container.querySelectorAll('input').length + 1;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'micro-input-field';
+      input.placeholder = `Paso ${count}: Siguiente acción...`;
+      container.appendChild(input);
     }
 
     function saveTask() {
-      if (currentTask.needsMicro) {
-        currentTask.microStep = document.getElementById('microInput').value;
-      }
+      const microFields = document.querySelectorAll('.micro-input-field');
+      currentTask.microSteps = [];
+      microFields.forEach(f => {
+        if (f.value.trim() !== "") {
+          currentTask.microSteps.push({ text: f.value.trim(), done: false });
+        }
+      });
 
-      renderTask(currentTask);
+      const newTask = {
+        id: Date.now(),
+        title: currentTask.title,
+        isLever: currentTask.isLever,
+        microSteps: currentTask.microSteps,
+        completed: false,
+        completedAt: null
+      };
+
+      tasks.push(newTask);
+      updateStorageAndRender();
       resetWizard();
       taskInput.value = "";
-      document.getElementById('microInput').value = "";
     }
 
     function resetWizard() {
       q1Box.style.display = 'none';
       q2Box.style.display = 'none';
       q3Box.style.display = 'none';
-      currentTask = { title: "", isLever: false, needsMicro: false, microStep: "" };
+      document.getElementById('microInputsContainer').innerHTML = '<input type="text" class="micro-input-field" placeholder="Paso 1: Contactar al mecánico..." />';
+      currentTask = { title: "", isLever: false, microSteps: [] };
     }
 
-    function renderTask(task) {
-      const li = document.createElement('li');
-      li.className = `task-item ${task.isLever ? 'lever' : 'maint'}`;
-      
-      let html = `
-        <div class="task-header">
-          <span class="task-title">${task.title}</span>
-          <button class="check-btn" onclick="this.parentElement.parentElement.remove()">Completar</button>
-        </div>
-      `;
-
-      if (task.isLever && task.microStep) {
-        html += `
-          <div class="micro-step">
-            <span>⚡ <strong>Paso 1 (Dominó):</strong> ${task.microStep}</span>
-          </div>
-        `;
-      }
-
-      li.innerHTML = html;
-
-      if (task.isLever) {
-        document.getElementById('leverList').appendChild(li);
-      } else {
-        document.getElementById('maintList').appendChild(li);
+    function toggleMicroStep(taskId, stepIndex) {
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        task.microSteps[stepIndex].done = !task.microSteps[stepIndex].done;
+        updateStorageAndRender();
       }
     }
+
+    function addMicroToExistingTask(taskId) {
+      const text = prompt("Ingrese el siguiente micro-paso:");
+      if (text && text.trim() !== "") {
+        const task = tasks.find(t => t.id === taskId);
+        if (task) {
+          task.microSteps.push({ text: text.trim(), done: false });
+          updateStorageAndRender();
+        }
+      }
+    }
+
+    function completeTask(taskId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        task.completed = true;
+        const now = new Date();
+        task.completedAt = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        updateStorageAndRender();
+      }
+    }
+
+    function updateStorageAndRender() {
+      localStorage.setItem('north_lever_tasks', JSON.stringify(tasks));
+      renderLists();
+    }
+
+    function renderLists() {
+      const leverList = document.getElementById('leverList');
+      const maintList = document.getElementById('maintList');
+      const doneList = document.getElementById('doneList');
+
+      leverList.innerHTML = "";
+      maintList.innerHTML = "";
+      doneList.innerHTML = "";
+
+      let leverCount = 0;
+      let maintCount = 0;
+
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+
+        if (task.completed) {
+          li.className = 'task-item done';
+          li.innerHTML = `
+            <div class="task-header">
+              <span class="task-title">✓ ${task.title}</span>
+            </div>
+            <span class="timestamp">Realizado el: ${task.completedAt}</span>
+          `;
+          doneList.appendChild(li);
+        } else {
+          li.className = `task-item ${task.isLever ? 'lever' : 'maint'}`;
+          
+          let microHtml = '';
+          if (task.microSteps && task.microSteps.length > 0) {
+            microHtml = '<div class="micro-container">';
+            task.microSteps.forEach((ms, idx) => {
+              microHtml += `
+                <div class="micro-step ${ms.done ? 'completed' : ''}">
+                  <span>⚡ Paso ${idx + 1}: ${ms.text}</span>
+                  <button class="check-btn" onclick="toggleMicroStep(${task.id}, ${idx})">${ms.done ? '✓' : 'Hacer'}</button>
+                </div>
+              `;
+            });
+            microHtml += '</div>';
+          }
+
+          let addMicroBtn = task.isLever ? `<button class="check-btn" style="margin-top:6px;" onclick="addMicroToExistingTask(${task.id})">+ Paso</button>` : '';
+
+          li.innerHTML = `
+            <div class="task-header">
+              <span class="task-title">${task.title}</span>
+              <button class="check-btn" onclick="completeTask(${task.id})">Completar</button>
+            </div>
+            ${microHtml}
+            ${addMicroBtn}
+          `;
+
+          if (task.isLever) {
+            leverList.appendChild(li);
+            leverCount++;
+          } else {
+            maintList.appendChild(li);
+            maintCount++;
+          }
+        }
+      });
+
+      document.getElementById('leverCount').innerText = leverCount;
+      document.getElementById('maintCount').innerText = maintCount;
+    }
+
+    // Carga inicial
+    renderLists();
   </script>
 </body>
 </html>
