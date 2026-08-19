@@ -24,6 +24,15 @@
     header h1 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: #a5b4fc; margin-bottom: 4px; }
     header p { font-size: 1.1rem; font-weight: 700; color: #fff; }
 
+    /* Tabs System */
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab-btn { flex: 1; padding: 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); cursor: pointer; font-weight: 600; text-align: center; transition: all 0.2s; }
+    .tab-btn:hover { background: #2dd4bf20; color: #fff; }
+    .tab-btn.active { background: #1e1b4b; color: #fff; border-color: #6366f1; box-shadow: 0 0 10px rgba(99, 102, 241, 0.2); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
     .card h2 { font-size: 1rem; margin-bottom: 12px; }
     input[type="text"] { width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 1rem; margin-bottom: 8px; }
@@ -40,15 +49,22 @@
     .section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; justify-content: space-between; }
     .title-lever { color: var(--accent-lever); }
     .title-maint { color: var(--accent-maint); }
-    .title-done { color: var(--success); margin-top: 24px; }
+    .title-done { color: var(--success); }
 
     .task-list { list-style: none; margin-bottom: 20px; }
     .task-item { background: var(--card-bg); border-left: 4px solid var(--border); border-radius: 0 8px 8px 0; padding: 12px; margin-bottom: 12px; }
     .task-item.lever { border-left-color: var(--accent-lever); }
     .task-item.maint { border-left-color: var(--accent-maint); }
-    .task-item.done { border-left-color: var(--success); opacity: 0.85; }
+    
+    /* Styles for Completed History */
+    .task-item.done-lever { border-left-color: var(--accent-lever); background: rgba(245, 158, 11, 0.05); }
+    .task-item.done-maint { border-left-color: var(--accent-maint); background: rgba(59, 130, 246, 0.05); }
+    .badge { font-size: 0.65rem; padding: 3px 6px; border-radius: 4px; margin-left: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle; }
+    .badge-lever { background: rgba(245, 158, 11, 0.2); color: var(--accent-lever); border: 1px solid var(--accent-lever); }
+    .badge-maint { background: rgba(59, 130, 246, 0.2); color: var(--accent-maint); border: 1px solid var(--accent-maint); }
+    
     .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; }
-    .task-title { font-weight: 600; font-size: 0.95rem; flex: 1; }
+    .task-title { font-weight: 600; font-size: 0.95rem; flex: 1; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
     
     .micro-container { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
     .micro-step { background: #0f172a; border: 1px dashed var(--border); border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; color: #e2e8f0; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
@@ -57,13 +73,17 @@
     .micro-step.completed { text-decoration: line-through; opacity: 0.5; border-style: solid; border-color: var(--success); color: var(--success); }
     .micro-text { flex: 1; word-break: break-word; }
 
-    .controls { display: flex; gap: 4px; align-items: center; }
+    /* Micro-steps for completed history (read only) */
+    .micro-step.history-micro { border: 1px solid #334155; background: transparent; color: var(--text-muted); font-size: 0.8rem; padding: 6px 10px; justify-content: flex-start; margin-bottom: 2px; border-radius: 4px; }
+    .history-micro::before { content: '✓'; color: var(--success); margin-right: 6px; font-weight: bold; }
+
+    .controls { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
     .icon-btn { background: #1e293b; border: 1px solid var(--border); color: var(--text-muted); padding: 4px 6px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; }
     .icon-btn:hover { color: #fff; border-color: #64748b; }
     .btn-danger { color: #f87171; }
     .btn-danger:hover { background: #450a0a; }
     
-    .timestamp { font-size: 0.75rem; color: var(--success); font-weight: normal; display: block; margin-top: 4px; }
+    .timestamp { font-size: 0.75rem; color: var(--success); font-weight: normal; display: block; margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 6px; }
   </style>
 </head>
 <body>
@@ -73,37 +93,44 @@
     <p>🎯 $1M USD + Libertad Financiera y Viajes con La Peque</p>
   </header>
 
-  <div class="card">
-    <h2>📥 Registrar Pendiente en el Sistema</h2>
-    <input type="text" id="taskInput" placeholder="Ej: Hablar con el abogado por la sucesión..." />
-
-    <div id="q1Box" class="quiz-box">
-      <p><strong>Filtro 1:</strong> ¿Esta tarea genera ingresos, destraba capital, elimina una gran fuga de ansiedad o construye tu libertad a largo plazo?</p>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="answerQ1(true)">SÍ (Es Palanca)</button>
-        <button class="btn-secondary" onclick="answerQ1(false)">NO (Mantenimiento)</button>
-      </div>
-    </div>
-
-    <div id="q2Box" class="quiz-box">
-      <p><strong>Filtro 2 (Resistencia):</strong> ¿Sentís fricción mental o postergación para empezarla?</p>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="answerQ2(true)">SÍ (Dividir en Dominó)</button>
-        <button class="btn-secondary" onclick="answerQ2(false)">NO (Pasa Directo)</button>
-      </div>
-    </div>
-
-    <div id="q3Box" class="quiz-box">
-      <p><strong>Efecto Dominó:</strong> Agregá los micro-pasos secuenciales:</p>
-      <div id="microInputsContainer">
-        <input type="text" class="micro-input-field" placeholder="Contactar al mecánico..." />
-      </div>
-      <button class="btn-add-micro" onclick="addMicroInputField()">+ Agregar otro micro-paso</button>
-      <button class="btn-action" onclick="saveTask()">Confirmar e Insertar en el Día</button>
-    </div>
+  <!-- Pestañas de Navegación -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('triage')">⚡ Triage & Foco Presente</button>
+    <button class="tab-btn" onclick="switchTab('historial')">🏆 Historial de Logros</button>
   </div>
 
-  <main>
+  <!-- SOLAPA 1: TRIAGE Y FOCO (Activa por defecto) -->
+  <div id="tab-triage" class="tab-content active">
+    <div class="card">
+      <h2>📥 Registrar Pendiente en el Sistema</h2>
+      <input type="text" id="taskInput" placeholder="Ej: Hablar con el abogado por la sucesión..." />
+
+      <div id="q1Box" class="quiz-box">
+        <p><strong>Filtro 1:</strong> ¿Esta tarea genera ingresos, destraba capital, elimina una gran fuga de ansiedad o construye tu libertad a largo plazo?</p>
+        <div class="btn-group">
+          <button class="btn-primary" onclick="answerQ1(true)">SÍ (Es Palanca)</button>
+          <button class="btn-secondary" onclick="answerQ1(false)">NO (Mantenimiento)</button>
+        </div>
+      </div>
+
+      <div id="q2Box" class="quiz-box">
+        <p><strong>Filtro 2 (Resistencia):</strong> ¿Sentís fricción mental o postergación para empezarla?</p>
+        <div class="btn-group">
+          <button class="btn-primary" onclick="answerQ2(true)">SÍ (Dividir en Dominó)</button>
+          <button class="btn-secondary" onclick="answerQ2(false)">NO (Pasa Directo)</button>
+        </div>
+      </div>
+
+      <div id="q3Box" class="quiz-box">
+        <p><strong>Efecto Dominó:</strong> Agregá los micro-pasos secuenciales:</p>
+        <div id="microInputsContainer">
+          <input type="text" class="micro-input-field" placeholder="Contactar al mecánico..." />
+        </div>
+        <button class="btn-add-micro" onclick="addMicroInputField()">+ Agregar otro micro-paso</button>
+        <button class="btn-action" onclick="saveTask()">Confirmar e Insertar en el Día</button>
+      </div>
+    </div>
+
     <div class="section-title title-lever">
       <span>🎯 El 20% Palanca (Máxima Batería)</span>
       <span id="leverCount">0</span>
@@ -115,12 +142,15 @@
       <span id="maintCount">0</span>
     </div>
     <ul id="maintList" class="task-list"></ul>
+  </div>
 
+  <!-- SOLAPA 2: HISTORIAL DE LOGROS -->
+  <div id="tab-historial" class="tab-content">
     <div class="section-title title-done">
-      <span>✅ Historial de Logros Completados</span>
+      <span>✅ Historial y Trazabilidad de Logros</span>
     </div>
     <ul id="doneList" class="task-list"></ul>
-  </main>
+  </div>
 
   <script>
     let tasks = JSON.parse(localStorage.getItem('north_lever_tasks')) || [];
@@ -131,6 +161,16 @@
     const q2Box = document.getElementById('q2Box');
     const q3Box = document.getElementById('q3Box');
 
+    // Gestión de Pestañas (Tabs)
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById('tab-' + tabId).classList.add('active');
+      document.querySelector(`button[onclick="switchTab('${tabId}')"]`).classList.add('active');
+    }
+
+    // Lógica del Input Wizard
     taskInput.addEventListener('focus', () => { if (taskInput.value.trim() !== "") q1Box.style.display = 'block'; });
     taskInput.addEventListener('input', () => { if (taskInput.value.trim() !== "") q1Box.style.display = 'block'; else resetWizard(); });
 
@@ -138,7 +178,7 @@
       currentTask.title = taskInput.value;
       currentTask.isLever = isPalanca;
       q1Box.style.display = 'none';
-      q2Box.style.display = 'block'; // Ambas pasan por el Filtro 2 de fricción
+      q2Box.style.display = 'block'; 
     }
 
     function answerQ2(hasFriction) {
@@ -196,7 +236,6 @@
       if (index === -1) return;
       const targetIsLever = tasks[index].isLever;
       
-      // Encontrar las tareas del mismo grupo para reordenar entre ellas
       const sameCategoryTasks = tasks.filter(t => t.isLever === targetIsLever && !t.completed);
       const subIndex = sameCategoryTasks.findIndex(t => t.id === taskId);
       const targetSubIndex = subIndex + direction;
@@ -205,7 +244,6 @@
         const otherTaskId = sameCategoryTasks[targetSubIndex].id;
         const otherIndex = tasks.findIndex(t => t.id === otherTaskId);
         
-        // Intercambiar posiciones
         const temp = tasks[index];
         tasks[index] = tasks[otherIndex];
         tasks[otherIndex] = temp;
@@ -312,20 +350,46 @@
       let leverCount = 0;
       let maintCount = 0;
 
-      tasks.forEach(task => {
+      // Ordenar: No completadas primero, completadas por fecha descendente
+      const sortedTasks = [...tasks].sort((a, b) => {
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        if (a.completed && b.completed) return b.id - a.id; 
+        return 0;
+      });
+
+      sortedTasks.forEach(task => {
         const li = document.createElement('li');
 
         if (task.completed) {
-          li.className = 'task-item done';
+          // Renderizado para Historial (Pestaña 2)
+          li.className = `task-item ${task.isLever ? 'done-lever' : 'done-maint'}`;
+          
+          let badgeHtml = task.isLever 
+            ? `<span class="badge badge-lever">PALANCA</span>` 
+            : `<span class="badge badge-maint">MANTENIMIENTO</span>`;
+
+          let microHistoryHtml = '';
+          if (task.microSteps && task.microSteps.length > 0) {
+            microHistoryHtml = '<div class="micro-container" style="margin-top: 12px; margin-bottom: 8px;">';
+            task.microSteps.forEach((ms, idx) => {
+              let cleanText = ms.text.replace(/^Paso\s*\d+:\s*/i, '');
+              microHistoryHtml += `<div class="micro-step history-micro">Paso ${idx + 1}: ${cleanText}</div>`;
+            });
+            microHistoryHtml += '</div>';
+          }
+
           li.innerHTML = `
             <div class="task-header">
-              <span class="task-title">✓ ${task.title}</span>
+              <span class="task-title">${task.title} ${badgeHtml}</span>
               <button class="icon-btn btn-danger" onclick="deleteTask(${task.id})">✕</button>
             </div>
-            <span class="timestamp">Realizado el: ${task.completedAt}</span>
+            ${microHistoryHtml}
+            <span class="timestamp">✓ Concretado el: ${task.completedAt}</span>
           `;
           doneList.appendChild(li);
+
         } else {
+          // Renderizado para Triage Activo (Pestaña 1)
           li.className = `task-item ${task.isLever ? 'lever' : 'maint'}`;
           
           let microHtml = '';
@@ -333,7 +397,6 @@
             microHtml = '<div class="micro-container">';
             task.microSteps.forEach((ms, idx) => {
               let cleanText = ms.text.replace(/^Paso\s*\d+:\s*/i, '');
-              
               microHtml += `
                 <div class="micro-step ${ms.done ? 'completed' : ''}">
                   <span class="micro-text">⚡ <strong>Paso ${idx + 1}:</strong> ${cleanText}</span>
@@ -381,6 +444,7 @@
       document.getElementById('maintCount').innerText = maintCount;
     }
 
+    // Inicializar renderizado
     renderLists();
   </script>
 </body>
